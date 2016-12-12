@@ -11,10 +11,10 @@ inpradIds = [33, 207, 206, 205, 204, 32]
 
 
 nel_arr_all = 100
-dateArr = fltarr(nel_arr_all)
+dateArr = lonarr(nel_arr_all)
 radIdArr = fltarr(nel_arr_all)
-minTimeArr = fltarr(nel_arr_all)
-maxTimeArr = fltarr(nel_arr_all)
+minTimeArr = intarr(nel_arr_all)
+maxTimeArr = intarr(nel_arr_all)
 
 
 rcnt=0
