@@ -5,9 +5,12 @@ common radarinfo
 common rad_data_blk
 
 
-fname_event='../data/sapsVelDates.txt' 
+;; create dates, times and necessary parameters
+;; from input radIds
+inpradIds = [33, 207, 206, 205, 204, 32]
 
-nel_arr_all = 2000
+
+nel_arr_all = 100
 dateArr = fltarr(nel_arr_all)
 radIdArr = fltarr(nel_arr_all)
 minTimeArr = fltarr(nel_arr_all)
@@ -15,27 +18,17 @@ maxTimeArr = fltarr(nel_arr_all)
 
 
 rcnt=0
-OPENR, 1, fname_event
-WHILE not eof(1) do begin
-	;; read the data line by line
+for rc=0,n_elements(inpradIds)-1 do begin
+	
 
-	READF,1, dateStr, radId, minTime, maxTime
-	currDate = ulong(dateStr)
-	currRadId = uint(radId)
-	currMinTime = uint(minTime)
-	currMaxTime = uint(maxTime)
-
-	print, currDate, currRadId, currMinTime, currMaxTime
-
-	dateArr[rcnt] = currDate
-	radIdArr[rcnt] = currRadId
-	minTimeArr[rcnt] = currMinTime
-	maxTimeArr[rcnt] = currMaxTime
+	dateArr[rcnt] = 20110409
+	radIdArr[rcnt] = inpradIds[rc]
+	minTimeArr[rcnt] = 0600
+	maxTimeArr[rcnt] = 1100
 
 	rcnt += 1
+endfor
 
-ENDWHILE         
-close,1	
 
 dateArr = dateArr[0:rcnt-1]
 radIdArr = radIdArr[0:rcnt-1]
