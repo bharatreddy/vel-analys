@@ -103,7 +103,7 @@ class LshellFit(object):
         if sapsData is not None:
             sapsSelPrdDF = sapsData[  ( sapsData["date"] - selDateTime < \
                 numpy.timedelta64(30,'m') ) & ( sapsData["date"]\
-                 - selDateTime > numpy.timedelta64(0,'m') )  \
+                 - selDateTime >= numpy.timedelta64(0,'m') )  \
                 ].reset_index(drop=True)
             # Now check if there is more than one time period in the 
             # selected interval ideally there shouldn't be, but if 
