@@ -1,8 +1,8 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2011, 4, 9, 8, 0 )
-    endDate = datetime.datetime( 2011, 4, 9, 10, 0 )
+    stDate = datetime.datetime( 2011, 4, 9, 6, 0 )
+    endDate = datetime.datetime( 2011, 4, 9, 11, 0 )
     inpLosVelFile = \
         "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
@@ -14,6 +14,7 @@ if __name__ == "__main__":
     plotFileName = \
         "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-time-test.pdf"
     svObj.plot_mean_mlt_time(fitResDF, plotFileName)
+    # svObj.plot_mean_vel_mlt(fitResDF, plotFileName)
 
 
 class SapsVelUtils(object):
@@ -58,7 +59,7 @@ class SapsVelUtils(object):
         return fitDF
 
     def plot_mean_mlt_time(self, fitDF, plotName,\
-         plotListMLTs=[ 23., 0., 1., 2.]):
+         plotListMLTs=[ 23., 0., 1., 2., 3., 4.]):
         import pandas
         import matplotlib.pyplot as plt
         from matplotlib.dates import DateFormatter,\
@@ -112,6 +113,14 @@ class SapsVelUtils(object):
         ax.set_ylabel('SAPS Velocities [m/s]')
         ax.set_xlabel('time')
         fig.savefig(plotName, dpi=125)
+
+    def plot_mean_vel_mlt(self, fitDF, plotName,\
+         avgTimeInterval=30):
+        """
+        In this function we plot mean velocities at different MLTs
+        averaged over a time interval
+        """
+        print fitDF.head()
 
 
 
