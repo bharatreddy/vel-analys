@@ -1,8 +1,8 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2011, 4, 9, 6, 0 )
-    endDate = datetime.datetime( 2011, 4, 9, 11, 0 )
+    stDate = datetime.datetime( 2011, 4, 9, 7, 0 )
+    endDate = datetime.datetime( 2011, 4, 9, 10, 30 )
     inpLosVelFile = \
         "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
@@ -106,6 +106,7 @@ class SapsVelUtils(object):
         span = self.startDate - self.endDate
         extra = datetime.timedelta(minutes=0)
         ax.set_xlim([self.startDate - extra, self.endDate + extra])
+        ax.set_ylim([0., 2500.])
 
         # grid, legend and yLabel
         ax.grid(True)
@@ -116,11 +117,13 @@ class SapsVelUtils(object):
 
     def plot_mean_vel_mlt(self, fitDF, plotName,\
          avgTimeInterval=30):
+        import pandas
+        import matplotlib.pyplot as plt
         """
         In this function we plot mean velocities at different MLTs
         averaged over a time interval
         """
-        print fitDF.head()
+
 
 
 

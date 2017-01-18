@@ -90,7 +90,7 @@ class LshellFit(object):
         #### filter for SAPS velocities ####
         # remove velocies whose magnitude is less than 200 m/s
         self.velsDataDF = self.velsDataDF[ \
-                abs(self.velsDataDF["Vlos"]) >= 200. ]
+                abs(self.velsDataDF["Vlos"]) >= 150. ]
         # SAPS(westward) Vlos are positive for positive azimuths
         #  and vice versa. Filter the others out.
         self.velsDataDF = self.velsDataDF[ \
