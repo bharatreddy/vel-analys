@@ -5,7 +5,7 @@ if __name__ == "__main__":
         "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
         "/home/bharat/Documents/code/vel-analys/data/processedSaps.txt"
-    lsObj = lshell_opt.LshellFit(inpLosVelFile, inpSAPSDataFile)
+    lsObj = lshell_opt.LshellFit(inpLosVelFile, inpSAPSDataFile=inpSAPSDataFile)
     inpDt = datetime.datetime( 2011, 4, 9, 8, 40 )
     resDF = lsObj.get_timewise_lshell_fits(inpDt)
     # plot the results
@@ -120,15 +120,15 @@ class LshellFit(object):
             poesBndDF['normMLT'] = [x-24 if x >= 12 else x \
                 for x in poesBndDF['poesMLT']]
             # Merge POES boundary DF with the vels DF
-            print "shape before join--->", velAnlysDF.shape
+            # print "shape before join--->", velAnlysDF.shape
             velAnlysDF = pandas.merge( velAnlysDF, poesBndDF, \
                 left_on="normMLTRound", right_on="normMLT", how="inner" )
-            print "shape after join--->", velAnlysDF.shape
+            # print "shape after join--->", velAnlysDF.shape
             # Filter out velocties above the POES boundary
             velAnlysDF = velAnlysDF[ \
                 velAnlysDF["MLAT"] < velAnlysDF["poesLat"] \
                 ].reset_index(drop=True).drop_duplicates()
-            print "shape after filtering by boundary--->", velAnlysDF.shape
+            # print "shape after filtering by boundary--->", velAnlysDF.shape
         # Now return the velocity DF
         return velAnlysDF
 
