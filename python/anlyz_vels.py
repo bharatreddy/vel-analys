@@ -11,10 +11,12 @@ if __name__ == "__main__":
         inpSAPSDataFile=inpSAPSDataFile, timeInterval=2 )
     fitResDF = svObj.get_fit_results()
     fitResDF.reset_index(drop=True,inplace=True)
-    plotFileName = \
-        "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-time-test.pdf"
-    svObj.plot_mean_mlt_time(fitResDF, plotFileName)
-    # svObj.plot_mean_vel_mlt(fitResDF, plotFileName)
+    # plotFileName = \
+    #     "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-time-test.pdf"
+    plotFileNameVelMlt = \
+    "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-variations-test.pdf"
+    # svObj.plot_mean_mlt_time(fitResDF, plotFileName)
+    svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
 
 
 class SapsVelUtils(object):
@@ -95,15 +97,12 @@ class SapsVelUtils(object):
             dates = [ tt for tt in currDF["date"] ]
             ax.plot_date(x=dates, y=currVels, fmt='.-', label=str(plotListMLTs[cnm]) + " MLT",
                 tz=None, xdate=True, ydate=False, linewidth=1.5, markersize=10.)
-
-
         # format the x tick marks
         ax.xaxis.set_major_formatter(DateFormatter('%H%M'))
         # ax.xaxis.set_minor_formatter(DateFormatter('\n%M'))
         ax.xaxis.set_major_locator(MinuteLocator(interval=20))
         # ax.xaxis.set_minor_locator(MinuteLocator(interval=10))
         # give a bit of space at each end of the plot - aesthetics
-        span = self.startDate - self.endDate
         extra = datetime.timedelta(minutes=0)
         ax.set_xlim([self.startDate - extra, self.endDate + extra])
         ax.set_ylim([0., 2500.])
@@ -117,13 +116,85 @@ class SapsVelUtils(object):
 
     def plot_mean_vel_mlt(self, fitDF, plotName,\
          avgTimeInterval=30):
+        import time
+        import datetime
         import pandas
         import matplotlib.pyplot as plt
         """
         In this function we plot mean velocities at different MLTs
-        averaged over a time interval
+        averaged over a time interval. Basically MLT variations at
+        different times.
         """
-
-
-
-
+        # Now we need to group the velocities by different time intervals
+        # say we have 30 min intervals, we need to get means of all velocities
+        # between 8 and 830 into 1 group, 830 and 9 to another and so on.
+        # We'll get seperate minute buckets/bins to do the same!
+        fitDF["timestamp"] = [ time.mktime(x.timetuple())\
+                                        for x in fitDF['date'] ]
+        # Now divide the timestamps into different bins based on
+        # the time interval provided as the input!
+        # Also need to convert the timeinterval to sec to 
+        # work with timestamps.
+        timeBins = []
+        binLabels = []
+        currTimeStamp = fitDF["timestamp"].min()
+        while currTimeStamp <= fitDF["timestamp"].max():
+            timeBins.append(currTimeStamp)
+            currDtObj = datetime.datetime.fromtimestamp(currTimeStamp)
+            if currTimeStamp == fitDF["timestamp"].min():
+                prevBinLabel = currDtObj.strftime("%H%M")
+            else:
+                binLabels.append( prevBinLabel + "-" + currDtObj.strftime("%H%M") )
+                prevBinLabel = currDtObj.strftime("%H%M")
+            currTimeStamp += avgTimeInterval*60.
+        # Apply the bins using pandas.cut functionality
+        fitDF = pandas.concat( [ fitDF, \
+                    pandas.cut( fitDF["timestamp"], \
+                               bins=timeBins, include_lowest=True,\
+                                labels=binLabels ) ], axis=1 )
+        # Now we need to change the col names to accomodate the labels
+        fitDF.columns = [ ["normMLT", "MLAT","vSaps", \
+                     "azim", "vMagnErr", "azimErr", "vLosMean",\
+                     "vLosMax", "goodFitCheck", "plot_MLATEnd",\
+                      "plot_normMLTEnd", "date", "timestamp", "timebins"] ]
+        # groupby the timebins and normMLTs and get mean velocities
+        mltTimeMeanVelsDF = fitDF.groupby( ["timebins","normMLT"]\
+            )["vSaps", "MLAT"].mean().reset_index()
+        # get to the plotting part!
+        plt.style.use('ggplot')
+        fig, ax = plt.subplots(figsize=(8, 4))
+        # set plot styling
+        min_date = None
+        max_date = None
+        for ctb, tb in enumerate(binLabels):
+            currDF = mltTimeMeanVelsDF[ mltTimeMeanVelsDF["timebins"] == tb ]
+            currVels = currDF["vSaps"]
+            currMlts = currDF["normMLT"]
+            currMlats = currDF["MLAT"]
+            # ax.plot(currMlts, currVels, fmt='.-', \
+            #     label=tb + " UT", linewidth=1.5, markersize=10.)
+            ax.plot(currMlts, currVels, ".-", label=tb + " UT", linewidth=1.5, markersize=10.)
+        # format the x tick marks
+        # ax.xaxis.set_major_formatter(DateFormatter('%H%M'))
+        # # ax.xaxis.set_minor_formatter(DateFormatter('\n%M'))
+        # ax.xaxis.set_major_locator(MinuteLocator(interval=20))
+        # # ax.xaxis.set_minor_locator(MinuteLocator(interval=10))
+        # # give a bit of space at each end of the plot - aesthetics
+        # extra = datetime.timedelta(minutes=0)
+        xlimRange = [ -3, 5 ]
+        # Also MLT is in normalized format, get the proper MLT values!
+        mltLabelsPlot = []
+        for x in range( xlimRange[0], xlimRange[1]+1 ):
+            if x < 0.:
+                mltLabelsPlot.append( str(x + 24) )
+            else:
+                mltLabelsPlot.append( str(x) )
+        ax.set_xlim([-3.,5.])
+        ax.set_ylim([0., 2500.])
+        ax.set_xticklabels(mltLabelsPlot)
+        # grid, legend and yLabel
+        ax.grid(True)
+        ax.legend(loc='best', prop={'size':'x-small'})
+        ax.set_ylabel('SAPS Velocities [m/s]')
+        ax.set_xlabel('MLT')
+        fig.savefig(plotName, dpi=125)
