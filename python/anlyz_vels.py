@@ -1,14 +1,14 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2011, 4, 9, 7, 0 )
-    endDate = datetime.datetime( 2011, 4, 9, 10, 30 )
+    stDate = datetime.datetime( 2011, 4, 9, 8, 0 )
+    endDate = datetime.datetime( 2011, 4, 9, 9, 0 )
     inpLosVelFile = \
         "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
         "/home/bharat/Documents/code/vel-analys/data/processedSaps.txt"
     svObj = anlyz_vels.SapsVelUtils( inpLosVelFile, stDate, endDate, \
-        inpSAPSDataFile=inpSAPSDataFile, timeInterval=2 )
+        inpSAPSDataFile=inpSAPSDataFile, timeInterval=10 )
     fitResDF = svObj.get_fit_results()
     fitResDF.reset_index(drop=True,inplace=True)
     # plotFileName = \
@@ -16,7 +16,9 @@ if __name__ == "__main__":
     plotFileNameVelMlt = \
     "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-variations-test.pdf"
     # svObj.plot_mean_mlt_time(fitResDF, plotFileName)
-    svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
+    # svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
+    saveFileName = "/home/bharat/Documents/code/vel-analys/data/apr9data.txt"
+    svObj.save_data(fitResDF,saveFileName)
 
 
 class SapsVelUtils(object):
@@ -173,14 +175,9 @@ class SapsVelUtils(object):
             currMlats = currDF["MLAT"]
             # ax.plot(currMlts, currVels, fmt='.-', \
             #     label=tb + " UT", linewidth=1.5, markersize=10.)
-            ax.plot(currMlts, currVels, ".-", label=tb + " UT", linewidth=1.5, markersize=10.)
-        # format the x tick marks
-        # ax.xaxis.set_major_formatter(DateFormatter('%H%M'))
-        # # ax.xaxis.set_minor_formatter(DateFormatter('\n%M'))
-        # ax.xaxis.set_major_locator(MinuteLocator(interval=20))
-        # # ax.xaxis.set_minor_locator(MinuteLocator(interval=10))
-        # # give a bit of space at each end of the plot - aesthetics
-        # extra = datetime.timedelta(minutes=0)
+            ax.plot(currMlts, currVels, ".-", label=tb + " UT",\
+                 linewidth=1.5, markersize=10.)
+        # plot formatting
         xlimRange = [ -3, 5 ]
         # Also MLT is in normalized format, get the proper MLT values!
         mltLabelsPlot = []
@@ -198,3 +195,19 @@ class SapsVelUtils(object):
         ax.set_ylabel('SAPS Velocities [m/s]')
         ax.set_xlabel('MLT')
         fig.savefig(plotName, dpi=125)
+
+    def save_data(self, fitDF, saveFileName):
+        """
+        Save the fit results df as a csv/txt file
+        The saved results can be used to make movies
+        or used for future analysis!
+        """
+        import pandas
+        # Now we need date and time seperately for idl
+        fitDF["dtStr"] = [ x.strftime("%Y%m%d") for x in fitDF["date"]]
+        fitDF["tmStr"] = [ x.strftime("%H%M") for x in fitDF["date"]]
+        # select the columns to save
+        fitDF = fitDF[ ["normMLT", "MLAT", "vSaps", "azim",\
+             "vMagnErr", "azimErr", "dtStr", "tmStr"] ]
+        # Save the DF to the given file
+        fitDF.to_csv(saveFileName, sep=' ', index=False)
