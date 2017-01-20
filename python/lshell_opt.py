@@ -75,6 +75,9 @@ class LshellFit(object):
         # remove where fitting conditions failed, basically get good fits
         fitResultsDF = fitsDF[ ~fitsDF['fit_discarded'] \
             ].reset_index(drop=True)
+        if fitResultsDF.shape[0] == 0:
+            "print No good fit found!! Skipping.."
+            return fitResultsDF
         # Also get only those rows where errors are < 50%
         fitResultsDF = fitResultsDF[ \
             (fitResultsDF["velMagnPercentError"] < 50.) &\

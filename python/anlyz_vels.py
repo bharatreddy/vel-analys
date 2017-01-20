@@ -1,14 +1,14 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2011, 4, 9, 8, 0 )
-    endDate = datetime.datetime( 2011, 4, 9, 9, 0 )
+    stDate = datetime.datetime( 2011, 4, 9, 7, 0 )
+    endDate = datetime.datetime( 2011, 4, 9, 10, 30 )
     inpLosVelFile = \
         "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
         "/home/bharat/Documents/code/vel-analys/data/processedSaps.txt"
     svObj = anlyz_vels.SapsVelUtils( inpLosVelFile, stDate, endDate, \
-        inpSAPSDataFile=inpSAPSDataFile, timeInterval=10 )
+        inpSAPSDataFile=inpSAPSDataFile, timeInterval=2 )
     fitResDF = svObj.get_fit_results()
     fitResDF.reset_index(drop=True,inplace=True)
     # plotFileName = \
@@ -56,6 +56,9 @@ class SapsVelUtils(object):
         for cd in self.dtList:
             print "working with time-->", cd
             currfitDF = self.lsObj.get_timewise_lshell_fits(cd)
+            if currfitDF.shape[0] == 0:
+                print "no good fits found! Moving on!!"
+                continue
             # To this DF add a datetime column, to distinguish between fits
             currfitDF["date"] = cd
             fitDFList.append( currfitDF )
