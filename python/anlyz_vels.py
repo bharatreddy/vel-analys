@@ -1,14 +1,15 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2011, 4, 9, 7, 0 )
-    endDate = datetime.datetime( 2011, 4, 9, 10, 30 )
+    stDate = datetime.datetime( 2012, 6, 18, 2, 0 )
+    endDate = datetime.datetime( 2012, 6, 18, 4, 0 )
     inpLosVelFile = \
-        "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
+        "/home/bharat/Documents/code/frmtd-vels/frmtd-saps-vels-20120618.txt"
+        #"/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
     inpSAPSDataFile = \
         "/home/bharat/Documents/code/vel-analys/data/processedSaps.txt"
     svObj = anlyz_vels.SapsVelUtils( inpLosVelFile, stDate, endDate, \
-        inpSAPSDataFile=inpSAPSDataFile, timeInterval=2 )
+        inpSAPSDataFile=inpSAPSDataFile, timeInterval=10 )
     fitResDF = svObj.get_fit_results()
     fitResDF.reset_index(drop=True,inplace=True)
     # plotFileName = \
@@ -16,9 +17,9 @@ if __name__ == "__main__":
     plotFileNameVelMlt = \
     "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-variations-test.pdf"
     # svObj.plot_mean_mlt_time(fitResDF, plotFileName)
-    # svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
-    saveFileName = "/home/bharat/Documents/code/vel-analys/data/apr9data.txt"
-    svObj.save_data(fitResDF,saveFileName)
+    svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
+    # saveFileName = "/home/bharat/Documents/code/vel-analys/data/apr9data.txt"
+    # svObj.save_data(fitResDF,saveFileName)
 
 
 class SapsVelUtils(object):
