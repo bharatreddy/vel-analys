@@ -4,7 +4,7 @@ pro plot_fit_vels
 common radarinfo
 common rad_data_blk
 
-fNameSapsVels = "/home/bharatr/Docs/data/apr9data.txt"
+fNameSapsVels = "/home/bharatr/Docs/data/jun18data.txt"
 
 ; some default settings
 velScale = [0., 1500.]
@@ -12,7 +12,7 @@ losVelScale = [-1200., 1200.]
 hemisphere = 1.
 coords = "mlt"
 xrangePlot = [-40, 40]
-yrangePlot = [-44,0]
+yrangePlot = [-44,20]
 factor = 300.
 fixed_length = -1
 symsize = 0.35
@@ -21,12 +21,15 @@ rad_load_colortable,/leicester
 
 nel_arr_all = 10000
 
+dtStr = lonarr(1)
+timeStr = intarr(1)
+
 mltArr = fltarr(nel_arr_all)
 latArr = fltarr(nel_arr_all)
 velMagnArr = fltarr(nel_arr_all)
 velAzimArr = fltarr(nel_arr_all)
 dateArr = lonarr(nel_arr_all)
-timeArr = lonarr(nel_arr_all)
+timeArr = intarr(nel_arr_all)
 julArr = dblarr(nel_arr_all)
 
 rcnt=0
@@ -45,7 +48,7 @@ WHILE not eof(1) do begin
 
 	;; for some reason dates are not working well! 
 	;; so doing a manual fix by adding 1. Check every time!!!
-	currDate = ulong(dtStr)+1
+	currDate = ulong(dtStr)
 	currTime = uint(timeStr)
 	sfjul,currDate,currTime,currJul
 
