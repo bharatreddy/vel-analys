@@ -1,11 +1,11 @@
 if __name__ == "__main__":
     import anlyz_vels
     import datetime
-    stDate = datetime.datetime( 2012, 6, 18, 2, 30 )
-    endDate = datetime.datetime( 2012, 6, 18, 4, 30 )
+    stDate = datetime.datetime( 2011, 4, 9, 7, 0 )
+    endDate = datetime.datetime( 2011, 4, 9, 9, 30 )
     inpLosVelFile = \
-        "/home/bharat/Documents/code/frmtd-vels/frmtd-saps-vels-20120618.txt"
-        #"/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
+        "/home/bharat/Documents/code/vel-analys/data/formatted-vels.txt"
+        #"/home/bharat/Documents/code/frmtd-vels/frmtd-saps-vels-20110409.txt"
     inpSAPSDataFile = \
         "/home/bharat/Documents/code/vel-analys/data/processedSaps.txt"
     svObj = anlyz_vels.SapsVelUtils( inpLosVelFile, stDate, endDate, \
@@ -13,13 +13,14 @@ if __name__ == "__main__":
     fitResDF = svObj.get_fit_results()
     fitResDF.reset_index(drop=True,inplace=True)
     plotFileName = \
-        "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-time-test.pdf"
+        "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-time-apr9.pdf"
     plotFileNameVelMlt = \
-    "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-variations-test.pdf"
+    "/home/bharat/Documents/code/vel-analys/figs/vels-mlt-variations-apr9.pdf"
     svObj.plot_mean_mlt_time(fitResDF, plotFileName)
-    svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt)
-    saveFileName = "/home/bharat/Documents/code/vel-analys/data/jun18data.txt"
-    svObj.save_data(fitResDF,saveFileName)
+    svObj.plot_mean_vel_mlt(fitResDF, plotFileNameVelMlt,\
+         avgTimeInterval=30)
+    # saveFileName = "/home/bharat/Documents/code/vel-analys/data/jun18data.txt"
+    # svObj.save_data(fitResDF,saveFileName)
 
 
 class SapsVelUtils(object):
@@ -67,7 +68,7 @@ class SapsVelUtils(object):
         return fitDF
 
     def plot_mean_mlt_time(self, fitDF, plotName,\
-         plotListMLTs=[ 18., 19., 20., 21., 22., 23. ]):
+         plotListMLTs=[ 21., 22., 23., 0., 1., 2., 3. ]):
         import pandas
         import matplotlib.pyplot as plt
         from matplotlib.dates import DateFormatter,\
@@ -182,7 +183,7 @@ class SapsVelUtils(object):
             ax.plot(currMlts, currVels, ".-", label=tb + " UT",\
                  linewidth=1.5, markersize=10.)
         # plot formatting
-        xlimRange = [ -6, 0 ]
+        xlimRange = [ -3, 3 ]
         # Also MLT is in normalized format, get the proper MLT values!
         mltLabelsPlot = []
         for x in range( xlimRange[0], xlimRange[1]+1 ):
@@ -190,7 +191,7 @@ class SapsVelUtils(object):
                 mltLabelsPlot.append( str(x + 24) )
             else:
                 mltLabelsPlot.append( str(x) )
-        ax.set_xlim([-6.,0.])
+        ax.set_xlim(xlimRange)
         ax.set_ylim([0., 2500.])
         ax.set_xticklabels(mltLabelsPlot)
         # grid, legend and yLabel
