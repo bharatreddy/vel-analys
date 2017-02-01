@@ -28,10 +28,11 @@ class LshellFit(object):
         self.velsDataDF = pandas.read_csv(losdataFile, sep=' ',\
                                      header=None, names=inpColNames)
         # add a datetime col
-        self.velsDataDF["date"] = pandas.to_datetime( \
-                                self.velsDataDF['dateStr'].astype(str) + "-" +\
-                                self.velsDataDF['timeStr'].astype(str), \
-                                format='%Y%m%d-%H%M')
+        # self.velsDataDF["date"] = pandas.to_datetime( \
+        #                         self.velsDataDF['dateStr'].astype(str) + "-" +\
+        #                         self.velsDataDF['timeStr'].astype(str), \
+        #                         format='%Y%m%d-%H%M')
+        self.velsDataDF["date"] = self.velsDataDF.apply( self.convert_to_datetime, axis=1 )
         # for some reason MLAT is a str type, convert it to float
         self.velsDataDF["MLAT"] = self.velsDataDF["MLAT"].astype(float)
         # Also get a normMLT for plotting & analysis
@@ -47,6 +48,44 @@ class LshellFit(object):
             print "Assuming all vels are below auroral oval!!"
         self.inpSAPSDataFile = inpSAPSDataFile
 
+    def convert_to_datetime(self,row):
+        # Given a datestr and a time string convert to a python datetime obj.
+        import datetime
+        datecolName="dateStr"
+        timeColName="timeStr"
+        currDateStr = str( int( row[datecolName] ) )
+    #     return currDateStr
+        if row[timeColName] < 10:
+            currTimeStr = "000" + str( int( row[timeColName] ) )
+        elif row[timeColName] < 100:
+            currTimeStr = "00" + str( int( row[timeColName] ) )
+        elif row[timeColName] < 1000:
+            currTimeStr = "0" + str( int( row[timeColName] ) )
+        else:
+            currTimeStr = str( int( row[timeColName] ) )
+        return datetime.datetime.strptime( currDateStr\
+                        + ":" + currTimeStr, "%Y%m%d:%H%M" )
+
+    def convert_to_datetime_sapsDF(self,row):
+        # Given a datestr and a time string convert to a python datetime obj.
+        # For sapsDataDF. This is not a good thing but the columns
+        # in the DF are named differently!
+        import datetime
+        datecolName="dateStr"
+        timeColName="time"
+        currDateStr = str( int( row[datecolName] ) )
+    #     return currDateStr
+        if int(row[timeColName]) < 10:
+            currTimeStr = "000" + str( int( row[timeColName] ) )
+        elif int(row[timeColName]) < 100:
+            currTimeStr = "00" + str( int( row[timeColName] ) )
+        elif int(row[timeColName]) < 1000:
+            currTimeStr = "0" + str( int( row[timeColName] ) )
+        else:
+            currTimeStr = str( int( row[timeColName] ) )
+        return datetime.datetime.strptime( currDateStr\
+                        + ":" + currTimeStr, "%Y%m%d:%H%M" )
+
     def get_timewise_lshell_fits(self,selDateTime):
         import pandas
         # given a date time obj, get the lshell fitted velocities.
@@ -56,9 +95,10 @@ class LshellFit(object):
         if self.inpSAPSDataFile is not None:
             sapsDataDF = pandas.read_csv(self.inpSAPSDataFile, sep=' ',\
                      dtype={'dateStr':'str', 'time': 'str'})
-            sapsDataDF["date"] = pandas.to_datetime( \
-                                    sapsDataDF['dateStr'] + "-" +\
-                                    sapsDataDF['time'], format='%Y%m%d-%H%M')
+            # sapsDataDF["date"] = pandas.to_datetime( \
+            #                         sapsDataDF['dateStr'] + "-" +\
+            #                         sapsDataDF['time'], format='%Y%m%d-%H%M')
+            sapsDataDF["date"] = sapsDataDF.apply( self.convert_to_datetime_sapsDF, axis=1 )
         # Now filter for SAPS velocities based on time and AO bnd
         velAnlysDF = self.filter_saps_vels(selDateTime, sapsData=sapsDataDF)
         # Divide the velocities into cells. There are two types of cells/grid
