@@ -15,7 +15,7 @@ def str_to_datetime(row):
             currTimeStr = str( int( row[timeColName] ) )
         return datetime.datetime.strptime( currDateStr\
                         + ":" + currTimeStr, "%Y%m%d:%H%M" )
-        
+
 if __name__ == "__main__":
     """
     In the current code we'll loop through each and every
@@ -65,6 +65,7 @@ if __name__ == "__main__":
             delDates = currEndDate - currStartDate
             # loop through the dates and create a list
             fitDFList = []
+            fitDF = None
             for dd in range((delDates.seconds)/(60*timeInterval) + 1):
                 currDate = currStartDate + \
                     datetime.timedelta( minutes=dd*timeInterval )
@@ -84,9 +85,11 @@ if __name__ == "__main__":
             # select the columns to save
             fitDF = fitDF[ ["normMLT", "MLAT", "vSaps", "azim",\
                  "vMagnErr", "azimErr", "dtStr", "tmStr"] ]
-            with open(fitResFile, 'a') as fra:
-                fitDF.to_csv(fra, header=False,\
-                                  index=False, sep=' ' )
+            # Now only update the file if fitDF is populated
+            if fitDF is not None:
+                with open(fitResFile, 'a') as fra:
+                    fitDF.to_csv(fra, header=False,\
+                                      index=False, sep=' ' )
             print "--------------------SAVED DATA------------------"
             print "--------------------NEXT EVENT------------------"
             del fitDF
