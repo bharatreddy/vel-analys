@@ -78,15 +78,15 @@ if __name__ == "__main__":
                 currfitDF["date"] = currDate
                 fitDFList.append( currfitDF )
                 fitDF = pandas.concat( fitDFList )
-            # Now append fitDF to a file and delete the DF!
-            # Now we need date and time seperately for idl
-            fitDF["dtStr"] = [ x.strftime("%Y%m%d") for x in fitDF["date"]]
-            fitDF["tmStr"] = [ x.strftime("%H%M") for x in fitDF["date"]]
-            # select the columns to save
-            fitDF = fitDF[ ["normMLT", "MLAT", "vSaps", "azim",\
-                 "vMagnErr", "azimErr", "dtStr", "tmStr"] ]
             # Now only update the file if fitDF is populated
             if fitDF is not None:
+                # Now append fitDF to a file and delete the DF!
+                # Also we need date and time seperately for idl
+                fitDF["dtStr"] = [ x.strftime("%Y%m%d") for x in fitDF["date"]]
+                fitDF["tmStr"] = [ x.strftime("%H%M") for x in fitDF["date"]]
+                # select the columns to save
+                fitDF = fitDF[ ["normMLT", "MLAT", "vSaps", "azim",\
+                     "vMagnErr", "azimErr", "dtStr", "tmStr"] ]
                 with open(fitResFile, 'a') as fra:
                     fitDF.to_csv(fra, header=False,\
                                       index=False, sep=' ' )
