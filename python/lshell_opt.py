@@ -539,8 +539,6 @@ class LshellFit(object):
                          "vMagnErr", "azimErr", "vLosMean",\
                          "vLosMax", "goodFitCheck" ]
         lshellDF = pandas.DataFrame( dataTupleArr, columns=lshellDFColList )
-
-
         # Plotting end points of vectors
         lshellDF["plot_MLATEnd"] = numpy.round( \
             (lshellDF["vSaps"]/1000.) * \
