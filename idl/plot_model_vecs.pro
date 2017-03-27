@@ -4,10 +4,10 @@ pro plot_model_vecs
 common radarinfo
 common rad_data_blk
 
-fNameSapsVels = "/home/bharatr/Docs/data/full-model-sample-dst-116.txt"
+fNameSapsVels = "/home/bharatr/Docs/data/full-model-sample-dst-50.txt"
 
 ; some default settings
-velScale = [0., 800.]
+velScale = [0., 1000.]
 losVelScale = [-800., 800.]
 hemisphere = 1.
 coords = "mlt"
@@ -19,8 +19,8 @@ symsize = 0.35
 load_usersym, /circle
 rad_load_colortable,/website
 
-currDate = 20130317;20150105;
-currTime = 2000;0500;
+currDate = 20150218;20150105;20130317;
+currTime = 0530;0500;2000;
 
 nel_arr_all = 10000
 
@@ -41,13 +41,13 @@ OPENR, 1, fNameSapsVels
 WHILE not eof(1) do begin
 	;; read the data line by line
 
-	READF,1, normMLT, mlat, prob_pred, dst_index, velMagn, velAzim
+	READF,1, currMLT, mlat, prob_pred, dst_index, velMagn, velAzim
 	
 
-	if normMLT lt 0. then begin
-		currMLT = normMLT + 24.
+	if currMLT gt 12. then begin
+		normMLT = currMLT - 24.
 	endif else begin
-		currMLT = normMLT
+		normMLT = currMLT
 	endelse
 
 	;; for some reason dates are not working well! 
@@ -165,6 +165,9 @@ for jcnt=0,n_elements(uniqJulsArr)-1 do begin
 
 	endfor
 
+	overlay_coast, coords=coords, jul=currSapsJul, /no_fill
+    map_overlay_grid, grid_linestyle=0, grid_linethick=1, grid_linecolor=get_gray()
+
 	plot_colorbar, 1., 1.5, 0.4, 0.5, /square, scale=losVelScale, parameter='velocity'
 
 endfor
@@ -258,6 +261,9 @@ for jcnt=0,n_elements(uniqJulsArr)-1 do begin
 				thick=2, COLOR=vec_col, noclip=0
 
 	endfor
+
+	overlay_coast, coords=coords, jul=currSapsJul, /no_fill
+    map_overlay_grid, grid_linestyle=0, grid_linethick=1, grid_linecolor=get_gray()
 
 	plot_colorbar, 1., 1.5, 0.4, 0.5, /square, scale=velScale, parameter='power', legend='Velocity[m/s]'
 
